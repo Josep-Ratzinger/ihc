@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class BishopValidator : MonoBehaviour
 {
+
+    public SoundController soundcontroller;
+
+
     // Valida movimiento diagonal del alfil. Devuelve true si es legal.
     // Si hay captura, retorna captureSq = casilla destino.
     public bool Validate(Vector2Int from, Vector2Int to, SideColor mover,
@@ -27,12 +31,14 @@ public class BishopValidator : MonoBehaviour
             if (state.TryGet(mid, out var _)) return false; // bloqueado
         }
 
-        // Destino: libre o enemigo (si aliado -> inválido)
+        // Destino: libre o enemigo (si aliado -> invï¿½lido)
         if (state.TryGet(to, out var occ))
         {
             if (occ.gate && occ.gate.color == mover) return false;
             captureSq = to; // enemigo
         }
+
+        soundcontroller.Sound_MoverFicha();
 
         return true;
     }

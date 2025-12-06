@@ -6,6 +6,9 @@ public class MoveCommitter : MonoBehaviour
     [Header("Refs")]
     public BoardBounds board;
     public ChessBoardState state;
+    public SoundController soundController;
+
+    public CaptureCounter captureCounter;
 
     void Reset()
     {
@@ -18,8 +21,23 @@ public class MoveCommitter : MonoBehaviour
                                PawnMoveResult result)
     {
         // Captura normal
+        //if (result.isCapture && result.captureSq.HasValue)
+        //    state.CaptureAt(result.captureSq.Value);
+
         if (result.isCapture && result.captureSq.HasValue)
+        {
+            if (state.TryGet(result.captureSq.Value, out var info))
+            {
+                CaptureCounter.Instance?.RegisterCapture(info.type);
+            }
+
             state.CaptureAt(result.captureSq.Value);
+            soundController?.Sound_ComerFicha();
+        }
+        else
+        {
+            soundController?.Sound_MoverFicha();
+        }
 
         // Snap a la casilla destino
         driver.SnapToSquare(to);
@@ -44,6 +62,8 @@ public class MoveCommitter : MonoBehaviour
         // Captura (si hay algo) — ojo: el GO está en occ.gate
         if (captureSq.HasValue && state.TryGet(captureSq.Value, out var occ) && occ.gate)
         {
+            CaptureCounter.Instance?.RegisterCapture(occ.type);
+
             if (occ.gate.gameObject) Destroy(occ.gate.gameObject);
             // NOTA: sin ClearAt, simplemente sobreescribiremos la casilla de destino abajo.
         }
@@ -63,8 +83,10 @@ public class MoveCommitter : MonoBehaviour
 
     public void CommitKnightMove(KnightMoveDriver driver, Vector2Int from, Vector2Int to, Vector2Int? captureSq)
     {
-        if (captureSq.HasValue && state.TryGet(captureSq.Value, out var occ) && occ.gate)
+        if (captureSq.HasValue && state.TryGet(captureSq.Value, out var occ) && occ.gate){
+            CaptureCounter.Instance?.RegisterCapture(occ.type);
             if (occ.gate.gameObject) Destroy(occ.gate.gameObject);
+        }
 
         driver.SnapToSquare(to);
         state.RegisterAt(to, driver.Gate, "Knight");
@@ -73,8 +95,10 @@ public class MoveCommitter : MonoBehaviour
     }
     public void CommitBishopMove(BishopMoveDriver driver, Vector2Int from, Vector2Int to, Vector2Int? captureSq)
     {
-        if (captureSq.HasValue && state.TryGet(captureSq.Value, out var occ) && occ.gate)
+        if (captureSq.HasValue && state.TryGet(captureSq.Value, out var occ) && occ.gate) {
+            CaptureCounter.Instance?.RegisterCapture(occ.type);
             if (occ.gate.gameObject) Destroy(occ.gate.gameObject);
+        }
 
         driver.SnapToSquare(to);
         state.RegisterAt(to, driver.Gate, "Bishop");
@@ -83,8 +107,10 @@ public class MoveCommitter : MonoBehaviour
     }
     public void CommitQueenMove(QueenMoveDriver driver, Vector2Int from, Vector2Int to, Vector2Int? captureSq)
     {
-        if (captureSq.HasValue && state.TryGet(captureSq.Value, out var occ) && occ.gate)
+        if (captureSq.HasValue && state.TryGet(captureSq.Value, out var occ) && occ.gate) {
+            CaptureCounter.Instance?.RegisterCapture(occ.type);
             if (occ.gate.gameObject) Destroy(occ.gate.gameObject);
+        }
 
         driver.SnapToSquare(to);
         state.RegisterAt(to, driver.Gate, "Queen");

@@ -2,7 +2,10 @@
 using UnityEngine;
 
 public class RookValidator : MonoBehaviour
-{
+{   
+    
+    public SoundController soundcontroller;
+
     // Devuelve true si es válido. captureSq = casilla de la pieza enemiga si hay captura; null si no.
     public bool Validate(Vector2Int from, Vector2Int to, SideColor color, ChessBoardState state, out Vector2Int? captureSq)
     {
@@ -35,6 +38,7 @@ public class RookValidator : MonoBehaviour
             captureSq = cur;
         }
 
+        soundcontroller.Sound_MoverFicha();
         return true;
     }
 }

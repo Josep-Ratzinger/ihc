@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class QueenValidator : MonoBehaviour
 {
+    public SoundController soundcontroller;
+
     // Devuelve true si es legal. Si hay captura: captureSq = 'to'
     public bool Validate(Vector2Int from, Vector2Int to, SideColor mover,
                          ChessBoardState state, out Vector2Int? captureSq)
@@ -34,6 +36,8 @@ public class QueenValidator : MonoBehaviour
             if (occ.gate && occ.gate.color == mover) return false; // aliado en destino
             captureSq = to; // enemigo
         }
+
+        soundcontroller.Sound_MoverFicha();
 
         return true;
     }

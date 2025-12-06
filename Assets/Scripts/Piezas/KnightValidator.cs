@@ -2,12 +2,14 @@ using UnityEngine;
 
 public class KnightValidator : MonoBehaviour
 {
+    public SoundController soundcontroller;
+
     // Devuelve true si el destino es legal. Si hay captura, retorna captureSq.
     public bool Validate(Vector2Int from, Vector2Int to, SideColor mover, ChessBoardState state, out Vector2Int? captureSq)
     {
         captureSq = null;
 
-        // delta en “L”
+        // delta en ï¿½Lï¿½
         int dx = Mathf.Abs(to.x - from.x);
         int dy = Mathf.Abs(to.y - from.y);
         bool isL = (dx == 1 && dy == 2) || (dx == 2 && dy == 1);
@@ -20,7 +22,9 @@ public class KnightValidator : MonoBehaviour
             captureSq = to; // enemigo
         }
 
-        // El caballo ignora intermedios, así que no revisamos camino
+        soundcontroller.Sound_MoverFicha();
+
+        // El caballo ignora intermedios, asï¿½ que no revisamos camino
         return true;
     }
 }

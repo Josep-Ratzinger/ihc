@@ -6,9 +6,9 @@ public class ChessBoardState : MonoBehaviour
     public static ChessBoardState Instance;
 
     [Header("Refs")]
-    public BoardBounds board;   // arrástralo
+    public BoardBounds board;   // arrï¿½stralo
 
-    // Ocupación por casilla
+    // Ocupaciï¿½n por casilla
     public struct PieceInfo
     {
         public SideColor color;
@@ -19,13 +19,13 @@ public class ChessBoardState : MonoBehaviour
 
     private Dictionary<Vector2Int, PieceInfo> occ = new();
 
-    // En passant (válido SOLO en el turno inmediatamente siguiente)
+    // En passant (vï¿½lido SOLO en el turno inmediatamente siguiente)
     private struct EnPassantInfo
     {
         public bool valid;
         public SideColor moverColor;
         public Vector2Int from, to, targetSquare; // target = casilla "saltada"
-        public PieceInfo pawnInfo;                // peón que dio el doble paso
+        public PieceInfo pawnInfo;                // peï¿½n que dio el doble paso
         public int createdTurnIndex;
     }
     private EnPassantInfo enPassant;
@@ -52,9 +52,30 @@ public class ChessBoardState : MonoBehaviour
         foreach (var g in gates)
         {
             var sq = board.WorldToSquare(g.transform.position);
-            var info = new PieceInfo { color = g.color, gate = g, root = g.transform, type = "Any" };
+
+            string type = InferPieceTypeFromName(g.gameObject.name);
+
+            var info = new PieceInfo { color = g.color, gate = g, root = g.transform, 
+            type  = type
+            //type = "Any" 
+            };
             occ[sq] = info;
         }
+    }
+
+    string InferPieceTypeFromName(string name)
+    {
+        name = name.ToLowerInvariant();
+
+        if (name.Contains("pawn"))   return "Pawn";
+        if (name.Contains("rook"))   return "Rook";
+        if (name.Contains("knight")) return "Knight";
+        if (name.Contains("bishop")) return "Bishop";
+        if (name.Contains("queen"))  return "Queen";
+        if (name.Contains("king"))   return "King";
+
+        // Por si algo raro no matchea
+        return "Any";
     }
 
     public bool TryGet(Vector2Int sq, out PieceInfo info) => occ.TryGetValue(sq, out info);
@@ -62,7 +83,7 @@ public class ChessBoardState : MonoBehaviour
 
     public void RegisterAt(Vector2Int sq, PieceTurnGate gate, string type = "Any")
     {
-        // elimina ubicación anterior de ese gate
+        // elimina ubicaciï¿½n anterior de ese gate
         Vector2Int? toRemove = null;
         foreach (var kv in occ)
             if (kv.Value.gate == gate) { toRemove = kv.Key; break; }
@@ -85,7 +106,7 @@ public class ChessBoardState : MonoBehaviour
     public void CaptureGiven(PieceInfo info)
     {
         if (info.root) info.root.gameObject.SetActive(false);
-        // limpiar su entrada si existía
+        // limpiar su entrada si existï¿½a
         Vector2Int? key = null;
         foreach (var kv in occ) if (kv.Value.gate == info.gate) { key = kv.Key; break; }
         if (key.HasValue) occ.Remove(key.Value);
@@ -112,7 +133,7 @@ public class ChessBoardState : MonoBehaviour
 
     public bool IsCurrentEnPassantTarget(Vector2Int square, SideColor capturerColor, out PieceInfo capturedPawn)
     {
-        // válido SOLO en el turno inmediatamente siguiente
+        // vï¿½lido SOLO en el turno inmediatamente siguiente
         if (enPassant.valid &&
             turnIndex == enPassant.createdTurnIndex + 1 &&
             square == enPassant.targetSquare &&

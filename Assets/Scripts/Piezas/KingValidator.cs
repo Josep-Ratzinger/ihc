@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class KingValidator : MonoBehaviour
 {
+
+    public SoundController soundcontroller;
+
     public bool ValidateKingStep(Vector2Int from, Vector2Int to, SideColor color, ChessBoardState state, out Vector2Int? captureSq)
     {
         captureSq = null;
@@ -14,6 +17,9 @@ public class KingValidator : MonoBehaviour
             if (state.TryGet(to, out var info) && info.color != color)
             {
                 captureSq = to;
+
+                soundcontroller.Sound_MoverFicha();
+
                 return true;
             }
         }
@@ -43,6 +49,9 @@ public class KingValidator : MonoBehaviour
         {
             if (state.IsOccupied(new Vector2Int(x, from.y))) return false;
         }
+
+        soundcontroller.Sound_MoverFicha();
+
         return true;
     }
 }

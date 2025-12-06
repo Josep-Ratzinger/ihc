@@ -11,6 +11,9 @@ public class BishopMoveDriver : MonoBehaviour
     public MoveCommitter committer;
     public BishopValidator validator;
 
+    // NUEVO
+    public MoveHintsHighlights hints;
+
     [Header("Snap")]
     public float heightEpsilon = 0.003f;
 
@@ -31,6 +34,9 @@ public class BishopMoveDriver : MonoBehaviour
         if (!state) state = ChessBoardState.Instance ?? FindObjectOfType<ChessBoardState>();
         if (!committer) committer = FindObjectOfType<MoveCommitter>();
         if (!validator) validator = GetComponent<BishopValidator>() ?? gameObject.AddComponent<BishopValidator>();
+
+        // new 
+        if (!hints) hints = MoveHintsHighlights.Instance ?? FindObjectOfType<MoveHintsHighlights>();
     }
 
     void Start()
@@ -40,6 +46,7 @@ public class BishopMoveDriver : MonoBehaviour
     }
 
     // InteractableUnityEventWrapper → When Select
+    /*
     public void OnGrabbed()
     {
         if (TurnManager.Instance && Gate.color != TurnManager.Instance.currentTurn)
@@ -54,10 +61,32 @@ public class BishopMoveDriver : MonoBehaviour
         _grabStartSq = board.WorldToSquare(transform.position);
         _grabYaw = transform.eulerAngles.y;
     }
+    */
+    public void OnGrabbed()
+    {
+        _grabStartSq = board.WorldToSquare(transform.position);
+        _grabYaw = transform.eulerAngles.y;
 
-    // InteractableUnityEventWrapper → When Unselect
+        // Si no es tu turno, NO se mueve ni se muestran hints
+        if (TurnManager.Instance && Gate.color != TurnManager.Instance.currentTurn)
+        {
+            _grabbed = false;
+            hints?.ClearAll();
+            return;
+        }
+
+        _grabbed = true;
+
+        // Mostrar posibles movimientos
+        hints?.ShowBishopMoves(_grabStartSq, Gate.color);
+    }
+
+    // InteractableUnityEventWrapper → When Unselect: al soltar
     public void OnReleased()
     {
+        // Siempre limpiamos las luces al soltar
+        hints?.ClearAll();
+
         if (!_grabbed)
         {
             SnapToSquare(_grabStartSq, _grabYaw);

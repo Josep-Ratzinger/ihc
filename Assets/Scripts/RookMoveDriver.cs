@@ -11,6 +11,7 @@ public class RookMoveDriver : MonoBehaviour
     public ChessBoardState state;
     public MoveCommitter committer;
     public RookValidator validator;
+    
 
     [Header("Ajustes")]
     public float heightEpsilon = 0.003f;

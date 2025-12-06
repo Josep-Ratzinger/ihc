@@ -21,15 +21,15 @@ public struct PawnMoveResult
 [DisallowMultipleComponent]
 public class PawnValidator : MonoBehaviour
 {
-    [Header("Orientación del tablero")]
+    [Header("Orientaciï¿½n del tablero")]
     public ForwardAxis forwardAxis = ForwardAxis.File;   // en tu caso avanzan por X
-    public Sign whiteForward = Sign.Negative;            // ajusta según tu giro
+    public Sign whiteForward = Sign.Negative;            // ajusta segï¿½n tu giro
 
-    [Header("Índices iniciales sobre el eje de avance (0..7)")]
+    [Header("ï¿½ndices iniciales sobre el eje de avance (0..7)")]
     public int whiteStartIndex = 1;
     public int blackStartIndex = 6;
 
-    [Header("Opciones de validación")]
+    [Header("Opciones de validaciï¿½n")]
     public bool requireStartIndexForDoubleStep = false;
 
     [Header("Debug")]
@@ -38,6 +38,8 @@ public class PawnValidator : MonoBehaviour
     // Guarda temporalmente la casilla objetivo del en passant
     private Vector2Int? enPassantTarget = null;
     private SideColor? enPassantColor = null;
+
+    public SoundController soundcontroller;
 
     public bool Validate(PawnMoveRequest req, ChessBoardState state, out PawnMoveResult res)
     {
@@ -70,6 +72,9 @@ public class PawnValidator : MonoBehaviour
             {
                 res.valid = true;
                 ResetEnPassant(); // limpiar anterior
+
+                soundcontroller.Sound_MoverFicha();
+
                 return true;
             }
 
@@ -94,6 +99,8 @@ public class PawnValidator : MonoBehaviour
                     enPassantColor = req.color;
 
                     if (debugLogs) Debug.Log($"Pawn OK: doble paso. EnPassantTarget={mid}");
+
+                    soundcontroller.Sound_MoverFicha();
                     return true;
                 }
             }
@@ -113,6 +120,8 @@ public class PawnValidator : MonoBehaviour
                 res.captureSq = req.to;
                 ResetEnPassant();
                 if (debugLogs) Debug.Log("Pawn OK: captura normal.");
+
+                soundcontroller.Sound_MoverFicha();
                 return true;
             }
 
@@ -126,10 +135,12 @@ public class PawnValidator : MonoBehaviour
                 // desactivar en passant tras usarlo
                 ResetEnPassant();
 
-                // opcional: podrías marcar la pieza como "muerta" en tu board manager
+                // opcional: podrï¿½as marcar la pieza como "muerta" en tu board manager
                 // state.RemovePiece(captureSq);
 
-                if (debugLogs) Debug.Log($"Pawn OK: captura al paso. Peón capturado en {captureSq}");
+                if (debugLogs) Debug.Log($"Pawn OK: captura al paso. Peï¿½n capturado en {captureSq}");
+
+                soundcontroller.Sound_MoverFicha();
                 return true;
             }
 
@@ -142,7 +153,7 @@ public class PawnValidator : MonoBehaviour
     }
 
     /// <summary>
-    /// Comprueba si el destino actual corresponde a una captura al paso válida.
+    /// Comprueba si el destino actual corresponde a una captura al paso vï¿½lida.
     /// </summary>
     private bool IsCurrentEnPassantTarget(Vector2Int dest, SideColor moverColor, out Vector2Int capturedSq)
     {
@@ -166,6 +177,7 @@ public class PawnValidator : MonoBehaviour
             ? new Vector2Int(dest.x, dest.y - dir)
             : new Vector2Int(dest.x - dir, dest.y);
 
+        soundcontroller.Sound_MoverFicha();
         return true;
     }
 
