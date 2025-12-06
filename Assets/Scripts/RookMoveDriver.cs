@@ -11,7 +11,7 @@ public class RookMoveDriver : MonoBehaviour
     public ChessBoardState state;
     public MoveCommitter committer;
     public RookValidator validator;
-    
+    public MoveHintsHighlights hints;
 
     [Header("Ajustes")]
     public float heightEpsilon = 0.003f;
@@ -36,6 +36,8 @@ public class RookMoveDriver : MonoBehaviour
         if (!state) state = ChessBoardState.Instance ?? FindObjectOfType<ChessBoardState>();
         if (!committer) committer = FindObjectOfType<MoveCommitter>();
         if (!validator) validator = GetComponent<RookValidator>() ?? gameObject.AddComponent<RookValidator>();
+        if (!hints) hints = MoveHintsHighlights.Instance ?? FindObjectOfType<MoveHintsHighlights>();
+
     }
 
     void Start()
@@ -47,6 +49,7 @@ public class RookMoveDriver : MonoBehaviour
     // Conectar en InteractableUnityEventWrapper → When Select
     public void OnGrabbed()
     {
+
         // si no es su turno, igual memorizamos para re-snap
         _grabStartSq = board.WorldToSquare(transform.position);
         _grabYaw = transform.eulerAngles.y;
@@ -58,11 +61,13 @@ public class RookMoveDriver : MonoBehaviour
         }
 
         _grabbed = true;
+        hints?.ShowRookMoves(_grabStartSq, Gate.color);
     }
 
     // Conectar en InteractableUnityEventWrapper → When Unselect
     public void OnReleased()
     {
+        hints?.ClearAll();
         // Si no era su turno → vuelve
         if (!_grabbed)
         {

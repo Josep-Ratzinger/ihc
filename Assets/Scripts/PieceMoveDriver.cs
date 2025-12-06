@@ -11,7 +11,7 @@ public class PieceMoveDriver : MonoBehaviour
     public ChessBoardState state;
     public MoveCommitter committer;   // llama NotifyPieceMoved internamente (turno)
     public PawnValidator pawnValidator;
-
+    public MoveHintsHighlights hints;
     [Header("Snap")]
     public float heightEpsilon = 0.003f;
 
@@ -35,6 +35,8 @@ public class PieceMoveDriver : MonoBehaviour
         if (!state) state = ChessBoardState.Instance ?? FindObjectOfType<ChessBoardState>();
         if (!committer) committer = FindObjectOfType<MoveCommitter>();
         if (!pawnValidator) pawnValidator = GetComponent<PawnValidator>();
+        if (!hints) hints = MoveHintsHighlights.Instance ?? FindObjectOfType<MoveHintsHighlights>();   // <--- NUEVO
+
     }
 
     void Start()
@@ -53,11 +55,17 @@ public class PieceMoveDriver : MonoBehaviour
         _grabbed = true;
         _startSq = board.WorldToSquare(transform.position);
         _startYaw = transform.eulerAngles.y;
+        if (hints && pawnValidator)
+        {
+            hints.ShowPawnMoves(_startSq, Gate.color, _hasMoved, pawnValidator);
+        }
     }
 
     // Vincular a When Unselect
     public void OnReleased()
     {
+        if (hints) hints.ClearAll();
+
         if (!_grabbed) return;
         _grabbed = false;
 

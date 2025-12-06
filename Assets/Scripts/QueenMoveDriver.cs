@@ -10,7 +10,7 @@ public class QueenMoveDriver : MonoBehaviour
     public ChessBoardState state;
     public MoveCommitter committer;
     public QueenValidator validator;
-
+    public MoveHintsHighlights hints;
     [Header("Snap")]
     public float heightEpsilon = 0.003f;
 
@@ -31,6 +31,9 @@ public class QueenMoveDriver : MonoBehaviour
         if (!state) state = ChessBoardState.Instance ?? FindObjectOfType<ChessBoardState>();
         if (!committer) committer = FindObjectOfType<MoveCommitter>();
         if (!validator) validator = GetComponent<QueenValidator>() ?? gameObject.AddComponent<QueenValidator>();
+
+        if (!hints) hints = MoveHintsHighlights.Instance ?? FindObjectOfType<MoveHintsHighlights>();
+
     }
 
     void Start()
@@ -53,11 +56,13 @@ public class QueenMoveDriver : MonoBehaviour
         _grabbed = true;
         _grabStartSq = board.WorldToSquare(transform.position);
         _grabYaw = transform.eulerAngles.y;
+        hints?.ShowQueenMoves(_grabStartSq, Gate.color);
     }
 
     // InteractableUnityEventWrapper → When Unselect
     public void OnReleased()
     {
+        hints?.ClearAll();
         if (!_grabbed)
         {
             SnapToSquare(_grabStartSq, _grabYaw);

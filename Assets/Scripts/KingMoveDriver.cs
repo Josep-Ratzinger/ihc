@@ -10,6 +10,7 @@ public class KingMoveDriver : MonoBehaviour
     public ChessBoardState state;
     public MoveCommitter committer;
     public KingValidator validator;
+    public MoveHintsHighlights hints;
 
     [Header("Ajustes")]
     public float heightEpsilon = 0.003f;
@@ -34,6 +35,9 @@ public class KingMoveDriver : MonoBehaviour
         if (!state) state = ChessBoardState.Instance ?? FindObjectOfType<ChessBoardState>();
         if (!committer) committer = FindObjectOfType<MoveCommitter>();
         if (!validator) validator = GetComponent<KingValidator>() ?? gameObject.AddComponent<KingValidator>();
+
+        if (!hints) hints = MoveHintsHighlights.Instance ?? FindObjectOfType<MoveHintsHighlights>();
+
     }
 
     void Start()
@@ -53,10 +57,12 @@ public class KingMoveDriver : MonoBehaviour
         grabbed = true;
         startSq = board.WorldToSquare(transform.position);
         startYaw = transform.eulerAngles.y;
+        hints?.ShowKingMoves(startSq, Gate.color);
     }
 
     public void OnReleased()
     {
+        hints?.ClearAll();
         if (!grabbed) { SnapToSquare(startSq, startYaw); return; }
         grabbed = false;
 
